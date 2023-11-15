@@ -43,23 +43,20 @@ func (d *DB) Register(u domain.User) (domain.User, error) {
 	return u, err
 }
 
-func (d *DB) GetUserByPhoneNumber(phoneNumber string) (domain.User, bool, error) {
+func (d *DB) GetUserByPhoneNumber(phoneNumber string) (domain.User, error) {
 	op := "sql.GetUserByPhoneNumber"
 	row := d.conn.Conn().QueryRow(`select * from users where phone_number = ?`, phoneNumber)
 
 	user, err := scanUser(row)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return domain.User{}, false, nil
-		}
 		return domain.User{},
-			false,
 			richerror.New(op).
-				WithCode(richerror.CodeUnexpected).
-				WithMessage(richerror.DBError).
+				WithCode(richerror.CodeInvalid).
+				WithMessage(richerror.RepetitivePhonNumber).
 				WithErr(err)
+
 	}
-	return user, true, nil
+	return user, nil
 }
 
 func (d *DB) GetUserByID(userID uint) (domain.User, error) {

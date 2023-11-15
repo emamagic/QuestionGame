@@ -3,23 +3,13 @@ package userservice
 import (
 	"game/domain"
 	"game/param"
-	"game/pkg/hash"
 	"game/pkg/richerror"
 )
 
-type Service struct {
-	repo        domain.UserRepo
-	hashPassGen hash.Service
-}
-
-func New(userRepo domain.UserRepo, hashPassGen hash.Service) Service {
-	return Service{repo: userRepo, hashPassGen: hashPassGen}
-}
 
 func (s Service) Register(p param.RegisterRequest) (param.RegisterResponse, error) {
 	op := "userservice.Register"
 	// TODO - tech debt => we should verify phone number by verification code
-
 	hashPassword, hashPasErr := s.hashPassGen.GenerateFromPassword(p.Password)
 	if hashPasErr != nil {
 		return param.RegisterResponse{},
@@ -42,7 +32,7 @@ func (s Service) Register(p param.RegisterRequest) (param.RegisterResponse, erro
 				WithErr(err)
 	}
 
-	return param.RegisterResponse{User: domain.UserInfo{
+	return param.RegisterResponse{User: param.UserInfo{
 		ID:          createdUser.ID,
 		PhoneNumber: createdUser.Name,
 		Name:        createdUser.PhoneNumber,

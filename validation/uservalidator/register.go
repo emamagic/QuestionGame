@@ -9,12 +9,8 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4"
 )
 
-const (
-	phoneNumberRegex = "^09[0-9]{9}$"
-)
-
 func (v Validator) ValidateUserRegister(req param.RegisterRequest) (map[string]string, error) {
-	const op = "uservalidator.ValidateRegisterRequest"
+	const op = "uservalidator.ValidateUserRegister"
 
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Name,
@@ -28,7 +24,7 @@ func (v Validator) ValidateUserRegister(req param.RegisterRequest) (map[string]s
 		validation.Field(&req.PhoneNumber,
 			validation.Required,
 			validation.Match(regexp.MustCompile(phoneNumberRegex)).
-				Error(richerror.InvalidInput),
+				Error(richerror.InvalidPhoneNumber),
 			validation.By(v.checkPhoneNumberUniqueness)),
 	); err != nil {
 		fieldErrors := make(map[string]string)

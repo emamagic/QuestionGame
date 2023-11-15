@@ -1,14 +1,24 @@
 package uservalidator
 
+import (
+	"game/domain"
+	"game/pkg/hash"
+)
 
-type Validator struct {
-	svc Service
-}
+const (
+	phoneNumberRegex = "^09[0-9]{9}$"
+)
 
 type Service interface {
 	IsPhoneNumberUnique(phoneNumber string) (bool, error)
+	GetUserByPhoneNumber(phoneNumber string) (domain.User, error)
 }
 
-func New(svc Service) Validator {
-	return Validator{svc: svc}
+type Validator struct {
+	svc Service
+	hashPassCompare hash.HashPassCompare
+}
+
+func New(svc Service, hashPassCompare hash.HashPassCompare) Validator {
+	return Validator{svc: svc, hashPassCompare: hashPassCompare}
 }

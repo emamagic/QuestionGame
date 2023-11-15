@@ -1,6 +1,6 @@
 package param
 
-import "game/domain"
+import ()
 
 type RegisterRequest struct {
 	Name        string `json:"name"`
@@ -9,6 +9,6 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	User     domain.UserInfo `json:"user"`
-	Metadata string          `json:"meta_data"`
+	User     UserInfo `json:"user"`
+	Metadata string   `json:"meta_data"`
 }
