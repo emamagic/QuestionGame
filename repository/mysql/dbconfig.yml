@@ -1,0 +1,10 @@
+production:
+  dialect: mysql
+  datasource: gameapp:gameappt0lk2o20@(localhost:3306)/gameapp_db?parseTime=true
+  dir: ../../repository/mysql/migrations
+  table: migrations
+
+# sql-migrate up -env="production" -config=dbconfig.yml
+# export GOPATH=$HOME/go
+# export PATH=$GOPATH/bin:$PATH
+# export GOBIN=$GOPATH/bin
