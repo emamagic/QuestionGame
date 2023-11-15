@@ -8,24 +8,24 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h Controller) userRegister(c echo.Context) error {
+func (c Controller) userRegister(e echo.Context) error {
 	var req param.RegisterRequest
-	if err := c.Bind(&req); err != nil {
+	if err := e.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
 
-	if fieldErrors, err := h.userValidator.ValidateUserRegister(req); err != nil {
+	if fieldErrors, err := c.userValidator.ValidateUserRegister(req); err != nil {
 		msg, code := richerror.Error(err)
-		return c.JSON(code, echo.Map{
+		return e.JSON(code, echo.Map{
 			"message": msg,
 			"errors":  fieldErrors,
 		})
 	}
 
-	resp, err := h.userSvc.Register(req)
+	resp, err := c.userSvc.Register(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, resp)
+	return e.JSON(http.StatusCreated, resp)
 }
