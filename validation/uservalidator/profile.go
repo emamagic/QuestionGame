@@ -7,7 +7,7 @@ import (
 func (v Validator) ValidateUserProfile(authToken string) (map[string]string, error) {
 	const op = "uservalidator.ValidateUserProfile"
 
-	_, paErr := v.authSvc.ParseToken(authToken)
+	_, paErr := v.tokenValidator.ParseToken(authToken)
 	if paErr != nil {
 		fieldErrors := make(map[string]string)
 		fieldErrors["userID"] = "unuthorized"

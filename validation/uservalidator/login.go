@@ -42,7 +42,7 @@ func (v Validator) ValidateUserLogin(req param.LoginRequest) (map[string]string,
 
 func (v Validator) doesPhoneNumberExist(value interface{}) error {
 	phoneNumber := value.(string)
-	_, err := v.svc.GetUserByPhoneNumber(phoneNumber)
+	_, err := v.repo.GetUserByPhoneNumber(phoneNumber)
 	if err != nil {
 		return fmt.Errorf(richerror.RecordNotFound)
 	}
@@ -51,7 +51,7 @@ func (v Validator) doesPhoneNumberExist(value interface{}) error {
 }
 
 func (v Validator) compareHashAndPassword(phoneNumber, password string) bool {
-	user, uErr := v.svc.GetUserByPhoneNumber(phoneNumber)
+	user, uErr := v.repo.GetUserByPhoneNumber(phoneNumber)
 	if uErr != nil {
 		return false
 	}

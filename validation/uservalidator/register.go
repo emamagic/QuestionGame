@@ -49,7 +49,7 @@ func (v Validator) ValidateUserRegister(req param.RegisterRequest) (map[string]s
 func (v Validator) checkPhoneNumberUniqueness(value interface{}) error {
 	phoneNumber := value.(string)
 
-	if isUnique, err := v.svc.IsPhoneNumberUnique(phoneNumber); err != nil || !isUnique {
+	if isUnique, err := v.repo.IsPhoneNumberUnique(phoneNumber); err != nil || !isUnique {
 		if err != nil {
 			return err
 		}
