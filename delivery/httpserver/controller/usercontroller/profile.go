@@ -2,6 +2,7 @@ package usercontroller
 
 import (
 	"game/param"
+	claim "game/pkg/cliam"
 	"game/pkg/richerror"
 	"net/http"
 
@@ -9,26 +10,13 @@ import (
 )
 
 func (c Controller) userProfile(e echo.Context) error {
-	var req param.ProfileRequest
-	if err := e.Bind(&req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest)
-	}
+	claims := claim.GetClaimsFromEchoContext(e)
 
-	authToken := e.Request().Header.Get("Authorization")
-	
-	if fieldErrors, err := c.userValidator.ValidateUserProfile(authToken); err != nil {
+	resp, err := c.userSvc.Profile(
+		param.ProfileRequest{UserID: claims.UserID})
+	if err != nil {
 		msg, code := richerror.Error(err)
-		return e.JSON(code, echo.Map{
-			"message": msg,
-			"errors":  fieldErrors,
-		})
-	}
-	// error has been check in validator
-	claims, _ := c.authSvc.ParseToken(authToken)
-
-	resp, pErr := c.userSvc.Profile(param.ProfileRequest{UserID: claims.UserID})
-	if pErr != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, pErr.Error())
+		return echo.NewHTTPError(code, msg)
 	}
 
 	return e.JSON(http.StatusOK, resp)

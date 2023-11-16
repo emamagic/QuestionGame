@@ -10,26 +10,17 @@ import (
 	"game/service/authservice"
 	"game/service/userservice"
 	"game/validation/uservalidator"
-	"time"
-)
-
-const (
-	JwtSignKey                 = "jwt-secret"
-	AccessTokenSubject         = "at"
-	RefreshTokenSubject        = "rt"
-	AccessTokenExpireDuration  = time.Hour * 24
-	RefreshTokenExpireDuration = time.Hour * 24 * 7
 )
 
 func main() {
 	cfg := config.Config{
 		HTTPServer: config.HTTPServer{Port: 8080},
 		Auth: authservice.Config{
-			SignKey:               JwtSignKey,
-			AccessExpirationTime:  AccessTokenExpireDuration,
-			RefreshExpirationTime: RefreshTokenExpireDuration,
-			AccessSubject:         AccessTokenSubject,
-			RefreshSubject:        RefreshTokenSubject,
+			SignKey:               config.JwtSignKey,
+			AccessExpirationTime:  config.AccessTokenExpireDuration,
+			RefreshExpirationTime: config.RefreshTokenExpireDuration,
+			AccessSubject:         config.AccessTokenSubject,
+			RefreshSubject:        config.RefreshTokenSubject,
 		},
 		Mysql: mysql.Config{
 			Username: "gameapp",
@@ -54,7 +45,7 @@ func setupServices(cfg config.Config) usercontroller.Controller {
 	mysqlusers := mysqluser.New(mysql)
 	userValidator := uservalidator.New(mysqlusers, authSvc, hashGen)
 	userSvc := userservice.New(authSvc, mysqlusers, hashGen)
-	return usercontroller.New(userSvc, authSvc, userValidator)
+	return usercontroller.New(userSvc, authSvc, userValidator, cfg.Auth)
 }
 
 // func writeTypedError(w http.ResponseWriter, code int, domainErr DomainError) {

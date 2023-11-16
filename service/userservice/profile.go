@@ -6,7 +6,7 @@ import (
 )
 
 func (s Service) Profile(req param.ProfileRequest) (param.ProfileResponse, error) {
-	op := "userservice.Profile"
+	op := "userservice.Profile" 
 	user, err := s.repo.GetUserByID(req.UserID)
 	if err != nil {
 		// I do not expect the repository call return "record not found",
