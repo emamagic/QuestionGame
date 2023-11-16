@@ -1,6 +1,5 @@
 package param
 
-import "game/domain"
 
 type LoginRequest struct {
 	PhoneNumber string `json:"phone_number"`
@@ -9,5 +8,5 @@ type LoginRequest struct {
 
 type LoginResponse struct {
 	UserInfo UserInfo `json:"user"`
-	Tokens   domain.Tokens   `json:"tokens"`
+	Tokens   Tokens   `json:"tokens"`
 }

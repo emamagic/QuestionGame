@@ -3,6 +3,7 @@ package uservalidator
 import (
 	"game/domain"
 	"game/pkg/hash"
+	"game/service/authservice"
 )
 
 const (
@@ -12,13 +13,15 @@ const (
 type Service interface {
 	IsPhoneNumberUnique(phoneNumber string) (bool, error)
 	GetUserByPhoneNumber(phoneNumber string) (domain.User, error)
+	GetUserByID(userID uint) (domain.User, error)
 }
 
 type Validator struct {
-	svc Service
+	svc             Service
+	authSvc         authservice.Service
 	hashPassCompare hash.HashPassCompare
 }
 
-func New(svc Service, hashPassCompare hash.HashPassCompare) Validator {
-	return Validator{svc: svc, hashPassCompare: hashPassCompare}
+func New(svc Service, authSvc authservice.Service, hashPassCompare hash.HashPassCompare) Validator {
+	return Validator{svc: svc, authSvc: authSvc, hashPassCompare: hashPassCompare}
 }

@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	Register(u domain.User) (domain.User, error)
 	GetUserByPhoneNumber(phoneNumber string) (domain.User, error)
+	GetUserByID(userID uint) (domain.User, error)
 }
 
 type Service struct {

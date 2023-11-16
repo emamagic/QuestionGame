@@ -8,4 +8,5 @@ func (h Controller) SetUserRoutes(e *echo.Echo) {
 	
 	userGroup.POST("/register", h.userRegister)
 	userGroup.POST("/login", h.userLogin)
+	userGroup.GET("/profile", h.userProfile)
 }

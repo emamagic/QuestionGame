@@ -1,7 +1,6 @@
 package userservice
 
 import (
-	"game/domain"
 	"game/param"
 	"game/pkg/richerror"
 )
@@ -35,6 +34,6 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 		PhoneNumber: user.PhoneNumber,
 		Name:        user.Name,
 	},
-		Tokens: domain.Tokens{AccessToken: accessToken, RefreshToken: refreshToken},
+		Tokens: param.Tokens{AccessToken: accessToken, RefreshToken: refreshToken},
 	}, nil
 }

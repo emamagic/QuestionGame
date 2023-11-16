@@ -52,9 +52,9 @@ func setupServices(cfg config.Config) usercontroller.Controller {
 	authSvc := authservice.New(cfg.Auth)
 	mysql := mysql.New(cfg.Mysql)
 	mysqlusers := mysqluser.New(mysql)
-	userValidator := uservalidator.New(mysqlusers, hashGen)
+	userValidator := uservalidator.New(mysqlusers, authSvc, hashGen)
 	userSvc := userservice.New(authSvc, mysqlusers, hashGen)
-	return usercontroller.New(userSvc, userValidator)
+	return usercontroller.New(userSvc, authSvc, userValidator)
 }
 
 // func writeTypedError(w http.ResponseWriter, code int, domainErr DomainError) {

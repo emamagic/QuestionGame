@@ -1,4 +1,4 @@
-package domain
+package param
 
 type Tokens struct {
 	AccessToken  string `json:"access-token"`
