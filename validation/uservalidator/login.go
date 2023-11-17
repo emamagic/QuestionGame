@@ -1,7 +1,6 @@
 package uservalidator
 
 import (
-	"fmt"
 	"game/param"
 	"game/pkg/richerror"
 	"regexp"
@@ -11,7 +10,6 @@ import (
 
 func (v Validator) ValidateUserLogin(req param.LoginRequest) (map[string]string, error) {
 	const op = "uservalidator.ValidateUserLogin"
-
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.PhoneNumber,
 			validation.Required,
@@ -44,7 +42,7 @@ func (v Validator) doesPhoneNumberExist(value interface{}) error {
 	phoneNumber := value.(string)
 	_, err := v.repo.GetUserByPhoneNumber(phoneNumber)
 	if err != nil {
-		return fmt.Errorf(richerror.RecordNotFound)
+		return err
 	}
 
 	return nil

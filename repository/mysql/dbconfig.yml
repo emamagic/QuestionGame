@@ -2,7 +2,7 @@ production:
   dialect: mysql
   datasource: gameapp:gameappt0lk2o20@(localhost:3306)/gameapp_db?parseTime=true
   dir: ../../repository/mysql/migrations
-  table: migrations
+  table: gorp_migrations
 
 # sql-migrate up -env="production" -config=dbconfig.yml
 # export GOPATH=$HOME/go

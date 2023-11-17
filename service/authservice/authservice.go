@@ -2,11 +2,9 @@ package authservice
 
 import (
 	"game/domain"
-	"game/pkg/richerror"
+	"github.com/golang-jwt/jwt/v4"
 	"strings"
 	"time"
-
-	"github.com/golang-jwt/jwt/v4"
 )
 
 type Config struct {
@@ -28,56 +26,51 @@ func New(cfg Config) Service {
 }
 
 func (s Service) CreateAccessToken(user domain.User) (string, error) {
-	return s.createToken(user.ID, s.config.AccessSubject, s.config.AccessExpirationTime)
+	return s.createToken(user.ID, user.Role, s.config.AccessSubject, s.config.AccessExpirationTime)
 }
 
 func (s Service) CreateRefreshToken(user domain.User) (string, error) {
-	return s.createToken(user.ID, s.config.RefreshSubject, s.config.RefreshExpirationTime)
+	return s.createToken(user.ID, user.Role, s.config.RefreshSubject, s.config.RefreshExpirationTime)
 }
 
 func (s Service) ParseToken(bearerToken string) (*Claims, error) {
 	//https://pkg.go.dev/github.com/golang-jwt/jwt/v5#example-ParseWithClaims-CustomClaimsType
-	op := "authservice.ParseToken"
+
 	tokenStr := strings.Replace(bearerToken, "Bearer ", "", 1)
 
-	token, err := jwt.ParseWithClaims(
-		tokenStr,
-		&Claims{},
-		func(token *jwt.Token) (interface{}, error) { return []byte(s.config.SignKey), nil })
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(s.config.SignKey), nil
+	})
 	if err != nil {
-		return nil,
-			richerror.New(op).
-				WithCode(richerror.CodeUnexpected).
-				WithErr(err)
+		return nil, err
 	}
 
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 		return claims, nil
 	} else {
-		return nil, nil
+		return nil, err
 	}
 }
 
-func (s Service) createToken(userID uint, subject string, expireDuration time.Duration) (string, error) {
+func (s Service) createToken(userID uint, role domain.Role, subject string, expireDuration time.Duration) (string, error) {
+	// create a signer for rsa 256
 	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go
 
-	op := "authservice.CreateToken"
+	// set our claims
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   subject,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expireDuration)),
 		},
 		UserID: userID,
+		Role:   role,
 	}
 
 	// TODO - add sign method to config
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := accessToken.SignedString([]byte(s.config.SignKey))
 	if err != nil {
-		return "",
-			richerror.New(op).
-				WithCode(richerror.CodeUnexpected).
-				WithErr(err)
+		return "", err
 	}
 
 	return tokenString, nil

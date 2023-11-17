@@ -10,4 +10,6 @@ const (
 	PhonNumberLessThanThreeNumber = "pass length should be greater then 3"
 	RecordNotFound                = "record not found"
 	InvalidInput                  = "you input is not valid"
+	SomethingWentWrong            = "something went worng"
+	UserNotAllowed                = "user not allowed"
 )

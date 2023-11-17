@@ -6,7 +6,6 @@ import (
 	"game/pkg/richerror"
 )
 
-
 func (s Service) Register(p param.RegisterRequest) (param.RegisterResponse, error) {
 	op := "userservice.Register"
 	// TODO - tech debt => we should verify phone number by verification code
@@ -22,6 +21,7 @@ func (s Service) Register(p param.RegisterRequest) (param.RegisterResponse, erro
 		PhoneNumber:  p.PhoneNumber,
 		Name:         p.Name,
 		HashPassword: hashPassword,
+		Role:         domain.UserRole,
 	}
 
 	createdUser, err := s.repo.Register(user)

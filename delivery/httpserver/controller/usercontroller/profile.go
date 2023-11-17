@@ -2,7 +2,7 @@ package usercontroller
 
 import (
 	"game/param"
-	claim "game/pkg/cliam"
+	"game/pkg/claim"
 	"game/pkg/richerror"
 	"net/http"
 

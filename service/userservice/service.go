@@ -5,18 +5,12 @@ import (
 	"game/pkg/hash"
 )
 
-type Repository interface {
-	Register(u domain.User) (domain.User, error)
-	GetUserByPhoneNumber(phoneNumber string) (domain.User, error)
-	GetUserByID(userID uint) (domain.User, error)
-}
-
 type Service struct {
 	auth domain.AuthGenerator
 	hashPassGen hash.HashPassGen
-	repo Repository
+	repo domain.UserRepo
 }
 
-func New(authGenerator domain.AuthGenerator, repo Repository, hashPassGen hash.HashPassGen) Service {
+func New(authGenerator domain.AuthGenerator, repo domain.UserRepo, hashPassGen hash.HashPassGen) Service {
 	return Service{auth: authGenerator, repo: repo, hashPassGen: hashPassGen}
 }

@@ -5,10 +5,12 @@ type User struct {
 	Name         string
 	PhoneNumber  string
 	HashPassword string
+	Role         Role
 }
 
+// TODO - domain module could separated into two pkg entity and repository
 type UserRepo interface {
 	Register(u User) (User, error)
-	Login(u User) (User, error)
-	// Profile(userID uint) (User, error)
+	GetUserByPhoneNumber(phoneNumber string) (User, error)
+	GetUserByID(userID uint) (User, error)
 }

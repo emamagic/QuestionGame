@@ -3,49 +3,60 @@ package main
 import (
 	"game/config"
 	"game/delivery/httpserver"
+	"game/delivery/httpserver/controller/backofficeusercontroller"
 	"game/delivery/httpserver/controller/usercontroller"
 	"game/pkg/hash"
+	"game/repository/migrator"
 	"game/repository/mysql"
+	"game/repository/mysql/mysqlaccesscontrol"
 	"game/repository/mysql/mysqluser"
+	"game/service/authorizationservice"
 	"game/service/authservice"
+	"game/service/backofficeuserservice"
 	"game/service/userservice"
 	"game/validation/uservalidator"
 )
 
 func main() {
-	cfg := config.Config{
-		HTTPServer: config.HTTPServer{Port: 8080},
-		Auth: authservice.Config{
-			SignKey:               config.JwtSignKey,
-			AccessExpirationTime:  config.AccessTokenExpireDuration,
-			RefreshExpirationTime: config.RefreshTokenExpireDuration,
-			AccessSubject:         config.AccessTokenSubject,
-			RefreshSubject:        config.RefreshTokenSubject,
-		},
-		Mysql: mysql.Config{
-			Username: "gameapp",
-			Password: "gameappt0lk2o20",
-			Port:     3306,
-			Host:     "localhost",
-			DBName:   "gameapp_db",
-		},
-	}
 
-	userController := setupServices(cfg)
-	server := httpserver.New(cfg, userController)
+	cfg := config.Load("config.yml")
+
+	// TODO - add command for migration
+	mgr := migrator.New(cfg.Mysql)
+	mgr.Up()
+
+	userController, backofficeusercontroller, authorizationservice := setupServices(cfg)
+	server := httpserver.New(cfg, userController, backofficeusercontroller, authorizationservice)
 
 	server.Serve()
 
 }
 
-func setupServices(cfg config.Config) usercontroller.Controller {
+func setupServices(cfg config.Config) (usercontroller.Controller, backofficeusercontroller.Controller, authorizationservice.Service) {
 	hashGen := hash.New()
+
 	authSvc := authservice.New(cfg.Auth)
+	
 	mysql := mysql.New(cfg.Mysql)
 	mysqlusers := mysqluser.New(mysql)
+	mysqlaccesscontrol := mysqlaccesscontrol.New(mysql)
+	
 	userValidator := uservalidator.New(mysqlusers, authSvc, hashGen)
+	
 	userSvc := userservice.New(authSvc, mysqlusers, hashGen)
-	return usercontroller.New(userSvc, authSvc, userValidator, cfg.Auth)
+	usercontroller := usercontroller.New(userSvc, authSvc, userValidator, cfg.Auth)
+	
+	authorizationSvc := authorizationservice.New(mysqlaccesscontrol)
+	
+	backofficeuserSvc := backofficeuserservice.New()
+	backofficeusercontroller := backofficeusercontroller.New(
+		cfg.Auth,
+		authSvc,
+		backofficeuserSvc,
+		authorizationSvc,
+	)
+
+	return usercontroller, backofficeusercontroller, authorizationSvc
 }
 
 // func writeTypedError(w http.ResponseWriter, code int, domainErr DomainError) {

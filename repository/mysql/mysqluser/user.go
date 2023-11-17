@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"game/domain"
 	"game/pkg/richerror"
-	"time"
+	"game/repository/mysql"
 )
 
 func (d *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
@@ -19,7 +19,7 @@ func (d *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
 		return false,
 			richerror.New(op).
 				WithCode(richerror.CodeUnexpected).
-				WithMessage(richerror.DBError).
+				WithMessage(richerror.RepetitivePhonNumber).
 				WithErr(err)
 	}
 	return false, nil
@@ -27,8 +27,8 @@ func (d *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
 
 func (d *DB) Register(u domain.User) (domain.User, error) {
 	op := "sql.Register"
-	res, err := d.conn.Conn().Exec(`insert into users(name, phone_number, password) values(?, ?, ?)`,
-		u.Name, u.PhoneNumber, u.HashPassword)
+	res, err := d.conn.Conn().Exec(`insert into users(name, phone_number, password, role) values(?, ?, ?, ?)`,
+		u.Name, u.PhoneNumber, u.HashPassword, u.Role.String())
 	if err != nil {
 		return domain.User{},
 			richerror.New(op).
@@ -52,7 +52,7 @@ func (d *DB) GetUserByPhoneNumber(phoneNumber string) (domain.User, error) {
 		return domain.User{},
 			richerror.New(op).
 				WithCode(richerror.CodeInvalid).
-				WithMessage(richerror.RepetitivePhonNumber).
+				WithMessage(richerror.InvalidInput).
 				WithErr(err)
 
 	}
@@ -81,10 +81,15 @@ func (d *DB) GetUserByID(userID uint) (domain.User, error) {
 	return user, nil
 }
 
-func scanUser(row *sql.Row) (domain.User, error) {
+func scanUser(scanner mysql.Scanner) (domain.User, error) {
+	var createdAt []uint8
 	var user domain.User
-	var createdAt time.Time
 
-	err := row.Scan(&user.ID, &user.Name, &user.PhoneNumber, &user.HashPassword, &createdAt)
+	var roleStr string
+
+	err := scanner.Scan(&user.ID, &user.Name, &user.PhoneNumber, &user.HashPassword, &createdAt, &roleStr)
+
+	user.Role = domain.MapToRoleEntity(roleStr)
+
 	return user, err
 }
