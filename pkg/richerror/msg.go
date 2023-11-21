@@ -12,4 +12,5 @@ const (
 	InvalidInput                  = "you input is not valid"
 	SomethingWentWrong            = "something went worng"
 	UserNotAllowed                = "user not allowed"
+	CategoryIsNotValid            = "category is not valid"
 )

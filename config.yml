@@ -7,7 +7,7 @@ http_server:
   port: 8080
 
 mysql:
-  port: 3306
+  port: 3308
   host: localhost
   db_name: gameapp_db
   username: gameapp
